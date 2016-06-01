@@ -14,9 +14,10 @@ $(document).ready(function(){
   		anwser = Math.floor((Math.random() * 100) + 1);
 		console.log(anwser);
 		count = 0;
-		$('.game').children('form').after('<p>Guess #<span>' + count + '</span>!</p>');
+		$('.game').children('form').after('<p>Guess #<span id="count">' + count + '</span>!</p>');
 		checkGuess('Make your Guess!')
 		guesses = [];
+		$('#guessList').children().hide();
 	}
 
 	// startsgame when page opens
@@ -28,9 +29,15 @@ $(document).ready(function(){
   	});
 	function counter() {
 	  	count += 1;
-	  	$('.game').children('form').after('<p>Guess #<span>' + count + '</span>!</p>');
+	  	$('.game').children('form').after('<p>Guess #<span id="count">' + count + '</span>!</p>');
 	}
-
+	function guesslist() {
+		$('#guessList').children().hide();
+		for (var i = 1; i >= guesses.length; i++) {
+			$('#guessList').append('<li>' + guesses[i] + '</li>');
+		}
+	}
+	
 
 	$('form').on('mouseup', '#guessButton', function(){
 		var guess = $('#userGuess').val();
@@ -47,6 +54,8 @@ $(document).ready(function(){
 				guess >= anwser - 10 && guess <= anwser + 10 ? checkGuess('hot') : false;
 				guess === anwser ? checkGuess('You Won. Click new game to play again') : false;
 				counter();
+				guesses.push(guess);
+				guesslist()
 				} : alert('You guessed this number already');
 			}
 		}
