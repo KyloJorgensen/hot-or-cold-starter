@@ -22,11 +22,6 @@ $(document).ready(function(){
 	}
 
 	function check() {
-		guess >= anwser - 40 && guess <= anwser + 40 ? feedBack('less then warm') : feedBack('cold');	
-		guess >= anwser - 30 && guess <= anwser + 30 ? feedBack('warm') : false;
-		guess >= anwser - 20 && guess <= anwser + 20 ? feedBack('Kinda hot') : false;
-		guess >= anwser - 10 && guess <= anwser + 10 ? feedBack('hot') : false;
-		guess === anwser ? feedBack('You Won. Click new game to play again') : false;
 		count += 1;
 		counter();
 		guesses.push(guess);
@@ -59,18 +54,39 @@ $(document).ready(function(){
   		newgame();
   	});
 
-	$('form').on('mouseup', '#guessButton', function(){
+	function enter() {
 		guess = $('#userGuess').val();
 		$('.game').children('form').children('#userGuess').hide()
 		$('.game').children('form').prepend('<input type="text" name="userGuess" id="userGuess" class="text" maxlength="3" autocomplete="off" placeholder="Enter your Guess" required/>')
 		guess = parseInt(guess);
+
 		if (guess % 1 == 0) {
-			var j = guesses.length;
-			j >= 1 ? checkGuess(j) : check();
+			if (guess <= 100 && guess >= 1) {
+				var j = guesses.length;
+				j >= 1 ? checkGuess(j) : check();
+				guess >= anwser - 40 && guess <= anwser + 40 ? feedBack('less then warm') : feedBack('cold');	
+				guess >= anwser - 30 && guess <= anwser + 30 ? feedBack('warm') : false;
+				guess >= anwser - 20 && guess <= anwser + 20 ? feedBack('Kinda hot') : false;
+				guess >= anwser - 10 && guess <= anwser + 10 ? feedBack('hot') : false;
+				guess === anwser ? feedBack('You Won. Click new game to play again') : false;
+			}
+			else {
+				alert('please input a number between 1 and 100');
+			}
 		}
 		else {
 			alert('please input a number');
 		}
+	}
+
+	$('form').on('mouseup', '#guessButton', function(){
+		enter();
+	});
+
+	$("body").keyup(function(event) {
+		if (event.which === 13) {
+			enter();
+		} 
 	});
 
 
