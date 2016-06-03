@@ -1,93 +1,80 @@
 $(document).ready(function(){
-	var anwser;
-	var count = 0;
-	var guesses = [];
-	var guess;
-	//changes the feedback text	
-	function feedBack(check) {
-		$('#feedback').hide();
-        $('.game').prepend('<h2 id="feedback">' + check + '</h2>');
-    }
-
-	function counter() {
-		$('.game').children('p').hide();
-	  	$('.game').children('form').after('<p>Guess <span id="count">' + count + '</span>!</p>');
-	}
-
-	function guesslist() {
-		$('#guessList').children().hide();
-		for (var i = 0; i < guesses.length; i++) {
-			$('#guessList').append('<li>' + guesses[i] + '</li>');
-		}
-	}
-
-	function check() {
-		count += 1;
-		counter();
-		guesses.push(guess);
-		guesslist();
-	}
-
-	// Starts runs the game
-  	function newgame(){
-  		anwser = Math.floor((Math.random() * 100) + 1);
-		count = 0;
-		counter();
-		feedBack('Make your Guess!')
+	var anwser = Math.floor((Math.random() * 100) + 1),
+		count = 0,
 		guesses = [];
-		guesslist();
-	}
-
-	function checkGuess(number) {
-		var checkstatus = false;
-		for (var i = 0; i < number; i++) {
-			checkstatus = guess == guesses[i] ? true : checkstatus;
-		}
-		checkstatus == false ? check() : alert('You guessed this number already');
-	}
-
-	// startsgame when page opens
-  	newgame();
 
   	// starts a another game
   	$('.clearfix').on('mouseup', '.new', function(){
   		newgame();
   	});
 
-	function enter() {
-		guess = $('#userGuess').val();
-		$('.game').children('form').children('#userGuess').hide()
-		$('.game').children('form').prepend('<input type="text" name="userGuess" id="userGuess" class="text" maxlength="3" autocomplete="off" placeholder="Enter your Guess" required/>')
-		guess = parseInt(guess);
+	// Starts runs the game
+  	function newgame(){
+  		anwser = Math.floor((Math.random() * 100) + 1);
+		count = 0;
+		$('#count').text(count);
+		$('#feedback').text('Make your Guess!');
+		guesses = [];
+		$('#guessList').children().hide();
+	}
 
-		if (guess % 1 == 0) {
-			if (guess <= 100 && guess >= 1) {
-				var j = guesses.length;
-				j >= 1 ? checkGuess(j) : check();
-				guess >= anwser - 40 && guess <= anwser + 40 ? feedBack('less then warm') : feedBack('cold');	
-				guess >= anwser - 30 && guess <= anwser + 30 ? feedBack('warm') : false;
-				guess >= anwser - 20 && guess <= anwser + 20 ? feedBack('Kinda hot') : false;
-				guess >= anwser - 10 && guess <= anwser + 10 ? feedBack('hot') : false;
-				guess === anwser ? feedBack('You Won. Click new game to play again') : false;
-			}
-			else {
-				alert('please input a number between 1 and 100');
-			}
+	//enters guess with a click
+	$('.game').on('mouseup', '#guessButton', function(){
+		validatesGuess($('#userGuess').val());
+		$('#userGuess').val('');
+	});
+
+	//enters guess by hiting enter
+	$("body").keyup(function(event) {
+		if (event.which === 13) {
+			validatesGuess($('#userGuess').val());
+			$('#userGuess').val('');
+		} 
+	});
+
+	// vailidates that the guess is a valid nubmer
+	function validatesGuess(guess) {
+
+		if (!isNaN(guess) && guess <= 100 && guess >= 1 && guess.length) {
+			feedBack(guess);
+			checkGuess(guess)
 		}
 		else {
-			alert('please input a number');
+			alert('please input a number between 1 and 100');
 		}
 	}
 
-	$('form').on('mouseup', '#guessButton', function(){
-		enter();
-	});
+	//changes the feedback text	
+	function feedBack(guess) {
+		var difference = Math.abs(anwser - guess);
 
-	$("body").keyup(function(event) {
-		if (event.which === 13) {
-			enter();
-		} 
-	});
+		difference <= 40 ? $('#feedback').text('less then warm') : $('#feedback').text('cold');	
+		difference <= 30 ? $('#feedback').text('warm') : '';
+		difference <= 20 ? $('#feedback').text('Kinda hot') : '';
+		difference <= 10 ? $('#feedback').text('hot') : '';
+		difference === 0 ? $('#feedback').text('You Won. Click new game to play again') : '';
+    }
+
+    //checks if guess has already been guessed
+	function checkGuess(guess) {
+		for (var i = 0; i < guesses.length; i++) {
+			if (guesses[i] == guess) {
+				return alert('You guessed this number already');
+			}
+		}
+		updateCount(guess);
+		appendGuess(guess);
+	}
+	//updates number of guess
+    function updateCount(guess) {
+		count += 1;
+		$('#count').text(count);
+    }
+    // adds vaild guesses to guess list
+	function appendGuess(guess) {
+		guesses.push(guess);
+		$('#guessList').append('<li>' + guess + '</li>');
+	}
 	
 	/*--- Display information modal box ---*/
   	$('.what').click(function(){
